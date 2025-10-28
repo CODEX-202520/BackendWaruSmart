@@ -231,6 +231,7 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment())
     {
         // In development, drop and recreate the database
+
         context.Database.EnsureCreated();
     }
     else

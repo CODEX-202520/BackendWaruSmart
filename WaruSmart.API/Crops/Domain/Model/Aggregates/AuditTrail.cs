@@ -15,7 +15,8 @@ namespace WaruSmart.API.Crops.Domain.Model.Aggregates
         public decimal SoilTemperature { get; private set; }
         public decimal AirTemperature { get; private set; }
         public decimal AirHumidity { get; private set; }
-        public string ImageUrl { get; private set; }
+        public byte[] ImageData { get; private set; }
+        public string ImageMimeType { get; private set; }
         public string PhenologicalPhase { get; private set; }
         public DateTime CreatedAt { get; private set; }
 
@@ -33,7 +34,8 @@ namespace WaruSmart.API.Crops.Domain.Model.Aggregates
             decimal soilTemperature,
             decimal airTemperature,
             decimal airHumidity,
-            string imageUrl,
+            byte[] imageData,
+            string imageMimeType,
             string phenologicalPhase)
         {
             return new AuditTrail
@@ -44,7 +46,8 @@ namespace WaruSmart.API.Crops.Domain.Model.Aggregates
                 SoilTemperature = soilTemperature,
                 AirTemperature = airTemperature,
                 AirHumidity = airHumidity,
-                ImageUrl = imageUrl,
+                ImageData = imageData,
+                ImageMimeType = imageMimeType,
                 PhenologicalPhase = phenologicalPhase,
                 CreatedAt = DateTime.UtcNow
             };
@@ -71,12 +74,16 @@ namespace WaruSmart.API.Crops.Domain.Model.Aggregates
             Description = description;
         }
 
-        public void AttachImage(string imageUrl)
+        public void AttachImage(byte[] imageData, string mimeType)
         {
-            if (string.IsNullOrWhiteSpace(imageUrl))
-                throw new ArgumentException("Image URL cannot be empty");
+            if (imageData == null || imageData.Length == 0)
+                throw new ArgumentException("Image data cannot be empty");
             
-            ImageUrl = imageUrl;
+            if (string.IsNullOrWhiteSpace(mimeType))
+                throw new ArgumentException("Image MIME type cannot be empty");
+
+            ImageData = imageData;
+            ImageMimeType = mimeType;
         }
 
         public void UpdatePhenologicalPhase(string phenologicalPhase)

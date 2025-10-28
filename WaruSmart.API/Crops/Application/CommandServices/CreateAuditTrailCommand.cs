@@ -8,7 +8,8 @@ namespace WaruSmart.API.Crops.Application.CommandServices
         public decimal SoilTemperature { get; set; }
         public decimal AirTemperature { get; set; }
         public decimal AirHumidity { get; set; }
-        public string ImageUrl { get; set; }
+        public byte[] ImageData { get; set; }
+        public string ImageMimeType { get; set; }
         public string PhenologicalPhase { get; set; }
     }
 }

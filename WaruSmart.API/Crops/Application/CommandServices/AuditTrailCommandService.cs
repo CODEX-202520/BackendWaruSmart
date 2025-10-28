@@ -34,7 +34,8 @@ public class AuditTrailCommandService : IAuditTrailCommandService
             command.SoilTemperature,
             command.AirTemperature,
             command.AirHumidity,
-            command.ImageUrl,
+            command.ImageData,
+            command.ImageMimeType,
             "Initial");
 
         return await _auditTrailRepository.AddAsync(auditTrail);
@@ -64,14 +65,17 @@ public class AuditTrailCommandService : IAuditTrailCommandService
                 document.Add(new Paragraph($"Temperatura del Aire: {audit.AirTemperature}°C"));
                 document.Add(new Paragraph($"Humedad del Aire: {audit.AirHumidity}%"));
 
-                if (!string.IsNullOrEmpty(audit.ImageUrl))
+                if (audit.ImageData != null && audit.ImageData.Length > 0)
                 {
                     try
                     {
-                        var imgData = ImageDataFactory.Create(audit.ImageUrl);
-                        var img = new Image(imgData);
-                        img.SetWidth(200);
-                        document.Add(img);
+                        using (var imageStream = new MemoryStream(audit.ImageData))
+                        {
+                            var imgData = ImageDataFactory.Create(audit.ImageData);
+                            var img = new Image(imgData);
+                            img.SetWidth(200);
+                            document.Add(img);
+                        }
                     }
                     catch (Exception)
                     {
