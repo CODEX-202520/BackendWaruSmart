@@ -5,9 +5,9 @@ using WaruSmart.API.IAM.Domain.Model.ValueObjects;
 
 namespace WaruSmart.API.IAM.Domain.Model.Aggregates;
 
-public class User(string username, string passwordHash)
+public class User(string username, string passwordHash, ERole role = ERole.AGRICULTOR)
 {
-    public User() : this(string.Empty, string.Empty)
+    public User() : this(string.Empty, string.Empty, ERole.AGRICULTOR)
     {
     }
     
@@ -16,6 +16,8 @@ public class User(string username, string passwordHash)
     public string Username { get; private set; } = username;
 
     [JsonIgnore] public string PasswordHash { get; private set; } = passwordHash;
+    
+    public ERole Role { get; private set; } = role;
     
     public ICollection<Sowing> Sowings { get; set; }
     
@@ -31,6 +33,12 @@ public class User(string username, string passwordHash)
     public User UpdateUsername(string username)
     {
         Username = username;
+        return this;
+    }
+    
+    public User UpdateRole(ERole role)
+    {
+        Role = role;
         return this;
     }
 

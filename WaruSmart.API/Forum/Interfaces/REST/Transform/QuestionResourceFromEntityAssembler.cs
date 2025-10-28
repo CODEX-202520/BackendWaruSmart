@@ -14,12 +14,12 @@ public static class QuestionResourceFromEntityAssembler
 
         if (entity.CategoryId == null)
         {
-            throw new ArgumentNullException(nameof(entity.AuthorId), "La propiedad AuthorId de la entidad Question no puede ser null.");
+            throw new ArgumentNullException(nameof(entity.CategoryId), "La propiedad CategoryId de la entidad Question no puede ser null.");
         }
         
         return new QuestionResource( 
             entity.Id,
-            entity.AuthorId.Id,
+            entity.AuthorId,
             entity.CategoryId,
             entity.QuestionText,
             entity.Date

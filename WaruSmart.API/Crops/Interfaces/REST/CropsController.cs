@@ -109,6 +109,10 @@ public class CropsController : ControllerBase
         {
             var getSowingByIdQuery = new GetSowingByIdQuery(id);
             var sowing = await sowingQueryService.Handle(getSowingByIdQuery);
+            if (sowing == null)
+            {
+                return NotFound();
+            }
             var resource = SowingResourceFromEntityAssembler.ToResourceFromEntity(sowing);
             return Ok(resource);
         }

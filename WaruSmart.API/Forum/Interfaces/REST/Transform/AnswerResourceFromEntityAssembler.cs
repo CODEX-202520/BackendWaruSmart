@@ -9,7 +9,7 @@ public static class AnswerResourceFromEntityAssembler
     {
         return new AnswerResource(
             entity.Id,
-            entity.AuthorId.Id,
+            entity.AuthorId,
             entity.QuestionId,
             entity.AnswerText
         );

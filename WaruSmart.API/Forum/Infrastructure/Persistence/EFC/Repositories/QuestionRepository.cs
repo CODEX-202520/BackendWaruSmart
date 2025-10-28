@@ -10,7 +10,7 @@ public class QuestionRepository(AppDbContext context) : BaseRepository<Question>
 {
     public async Task<IEnumerable<Question>> FindByUserIdAsync(int authorId)
     {
-        return await Context.Set<Question>().Where(q => q.AuthorId.Id == authorId).ToListAsync();
+        return await Context.Set<Question>().Where(q => q.AuthorId == authorId).ToListAsync();
     }
 
     public bool ExistsByQuestionText(string questionText)

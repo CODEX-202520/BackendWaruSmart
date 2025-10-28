@@ -3,11 +3,12 @@ using WaruSmart.API.Profiles.Interfaces.REST.Resources;
 
 namespace WaruSmart.API.Profiles.Interfaces.REST.Transform;
 
-public static class CreateSubscriptionCommandFromResourceAssembler
+public static class UpdateSubscriptionCommandFromResourceAssembler
 {
-    public static CreateSubscriptionCommand ToCommandFromResource(CreateSubscriptionResource resource)
+    public static UpdateSubscriptionCommand ToCommandFromResource(int id, UpdateSubscriptionResource resource)
     {
-        return new CreateSubscriptionCommand(
+        return new UpdateSubscriptionCommand(
+            id,
             resource.Name,
             resource.Description,
             resource.Price,

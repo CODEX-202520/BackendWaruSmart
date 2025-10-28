@@ -11,12 +11,16 @@ using WaruSmart.API.Profiles.Domain.Model.Aggregates;
 using WaruSmart.API.Profiles.Domain.Model.Entities;
 using WaruSmart.API.Resources.Domain.Model;
 
+
 namespace WaruSmart.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
+    public DbSet<AuditTrail> AuditTrails { get; set; }
+    public DbSet<Sowing> Sowings { get; set; }
+    
     protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {
         builder.AddCreatedUpdatedInterceptor();
@@ -42,7 +46,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Entity<Question>().Property(q => q.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<Question>().Property(q => q.QuestionText).IsRequired();
         builder.Entity<Question>().Property(q => q.Date).IsRequired();
-        
+
         builder.Entity<Category>()
             .HasMany(c => c.Questions)
             .WithOne(q => q.Category)
@@ -51,8 +55,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Entity<Answer>().HasKey(a => a.Id);
         builder.Entity<Answer>().Property(a => a.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<Answer>().Property(a => a.AnswerText).IsRequired();
-
-
 
         builder.Entity<Question>()
             .HasMany(q => q.Answers)
@@ -132,6 +134,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Entity<Control>().Property(f => f.SoilMoisture).IsRequired();
         builder.Entity<Control>().Property(f => f.StemCondition).IsRequired();
         
+        // AuditTrail Aggregate
+        builder.Entity<AuditTrail>().HasKey(f => f.Id);
+        builder.Entity<AuditTrail>().Property(f => f.Id).ValueGeneratedOnAdd();
+        builder.Entity<AuditTrail>().Property(f => f.SowingId).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.Description).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.SoilMoisture).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.SoilTemperature).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.AirTemperature).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.AirHumidity).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.PhenologicalPhase).IsRequired();
+        builder.Entity<AuditTrail>().Property(f => f.CreatedAt).IsRequired();
+        
+        builder.Entity<AuditTrail>()
+            .HasOne(a => a.Sowing)
+            .WithMany()
+            .HasForeignKey(a => a.SowingId);
+        
         // Add a navigation property for Controls
         builder.Entity<Sowing>()
             .HasMany(s => s.Controls)
@@ -156,6 +175,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         builder.Entity<User>().Property(u => u.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<User>().Property(u => u.Username).IsRequired();
         builder.Entity<User>().Property(u => u.PasswordHash).IsRequired();
+        builder.Entity<User>().Property(u => u.Role).HasConversion<string>().IsRequired();
         
         builder.Entity<User>()
             .HasMany(u => u.Sowings)
@@ -179,11 +199,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 e.WithOwner().HasForeignKey("Id");
                 e.Property(a => a.Address).HasColumnName("EmailAddress");
             });
-        builder.Entity<Profile>().Property(p => p.SubscriptionId).IsRequired();
-        builder.Entity<Profile>().Property(p => p.ERole).HasConversion<string>().IsRequired();
-        builder.Entity<Subscription>().Property(p=>p.Description).IsRequired();
-        builder.Entity<Subscription>().Property(p=>p.Price).IsRequired();
-        builder.Entity<Subscription>().Property(p=>p.Range).IsRequired();
+    builder.Entity<Profile>().Property(p => p.SubscriptionId).IsRequired();
+    builder.Entity<Profile>().Property(p => p.ERole).HasConversion<string>().IsRequired();
+            // Subscriptions Context
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().HasKey(s => s.Id);
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Name).IsRequired();
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Description).IsRequired();
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Price).IsRequired();
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.DurationInDays).IsRequired();
+        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.IsActive).IsRequired();
         
         
         // RELATIONSHIPS 

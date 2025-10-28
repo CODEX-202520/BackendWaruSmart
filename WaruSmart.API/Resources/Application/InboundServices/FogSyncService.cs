@@ -10,8 +10,6 @@ public class FogSyncService:IFogSyncService
     private readonly IIoTDataRepository _repository;
     private readonly IDeviceRepository _deviceRepository;
     private readonly ISowingRepository _sowingRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    
 
     public FogSyncService(IIoTDataRepository repository,
         IDeviceRepository deviceRepository,

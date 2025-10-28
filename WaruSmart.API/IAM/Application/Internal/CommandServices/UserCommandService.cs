@@ -27,7 +27,8 @@ public class UserCommandService(
         }
         catch (Exception e)
         {
-            throw new Exception($"An error occurred while creating user: {e.Message}");
+            // Re-throw with full exception details to help debugging in development
+            throw new Exception($"An error occurred while creating user: {e}");
         }
     }
 
