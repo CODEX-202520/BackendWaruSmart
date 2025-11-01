@@ -14,7 +14,7 @@ public class AnswerRepository(AppDbContext context) : BaseRepository<Answer>(con
         return await Context.Set<Answer>().Where(a => a.QuestionId == questionId).ToListAsync();
     }
 
-    public bool ExistsByAnswerTextAndAuthorId(string answerText, UserId authorId)
+    public bool ExistsByAnswerTextAndAuthorId(string answerText, int authorId)
     {
         return Context.Set<Answer>().Any(a => a.AnswerText == answerText && a.AuthorId == authorId);
     }

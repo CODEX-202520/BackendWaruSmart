@@ -2,6 +2,7 @@
 
 public enum ERole
 {
-    Agriculturist,
-    Cooperative
+    AGRICULTOR,
+    COOPERATIVA,
+    ADMINISTRADOR_WARU_SMART
 }

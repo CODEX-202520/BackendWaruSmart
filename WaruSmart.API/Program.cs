@@ -1,3 +1,13 @@
+using WaruSmart.API.Profiles.Domain.Model.Entities;
+using WaruSmart.API.Profiles.Domain.Repositories;
+using WaruSmart.API.Profiles.Domain.Services;
+using WaruSmart.API.Profiles.Infrastructure.Persistence.EFC.Repositories;
+using WaruSmart.API.Profiles.Application.Internal.CommandServices;
+using WaruSmart.API.Profiles.Application.Internal.QueryServices;
+using WaruSmart.API.Profiles.Interfaces.ACL;
+using WaruSmart.API.Profiles.Interfaces.ACL.Services;
+using WaruSmart.API.Profiles.Infrastructure.Persistence.EFC;
+using WaruSmart.API.Shared.Infrastructure.Persistence.EFC;
 using WaruSmart.API.Forum.Application.CommandServices;
 using WaruSmart.API.Forum.Application.QueryService;
 using WaruSmart.API.Forum.Domain.Repositories;
@@ -15,11 +25,6 @@ using WaruSmart.API.IAM.Infrastructure.Tokens.JWT.Configuration;
 using WaruSmart.API.IAM.Infrastructure.Tokens.JWT.Services;
 using WaruSmart.API.IAM.Interfaces.ACL;
 using WaruSmart.API.IAM.Interfaces.ACL.Services;
-using WaruSmart.API.Profiles.Application.Internal.CommandServices;
-using WaruSmart.API.Profiles.Application.Internal.QueryServices;
-using WaruSmart.API.Profiles.Domain.Repositories;
-using WaruSmart.API.Profiles.Domain.Services;
-using WaruSmart.API.Profiles.Infrastructure.Persistence.EFC.Repositories;
 using WaruSmart.API.Shared.Domain.Repositories;
 using  WaruSmart.API.Shared.Interfaces.ASP.Configuration;
 using  WaruSmart.API.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -36,6 +41,8 @@ using WaruSmart.API.Resources.Application.InboundServices;
 using WaruSmart.API.Resources.Domain.Repositories;
 using WaruSmart.API.Resources.Domain.Services;
 using WaruSmart.API.Resources.Infrastructure.Persistence.EFC;
+using WaruSmart.API.IAM.Interfaces.REST.Transform;
+using WaruSmart.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -198,8 +205,17 @@ builder.Services.AddScoped<IControlQueryService, ControlQueryService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<IProfileCommandService, ProfileCommandService>();
 builder.Services.AddScoped<IProfileQueryService, ProfileQueryService>();
-builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
+builder.Services.AddScoped<IProfilesContextFacade, ProfilesContextFacade>();
+
+// Add Subscription Services to IAM Context
 builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
+builder.Services.AddScoped<ISubscriptionQueryService, SubscriptionQueryService>();
+
+// Add Subscription Assemblers
+builder.Services.AddScoped<SubscriptionResourceFromEntityAssembler>();
+builder.Services.AddScoped<CreateSubscriptionCommandFromResourceAssembler>();
+builder.Services.AddScoped<UpdateSubscriptionCommandFromResourceAssembler>();
 
 builder.Services.AddScoped<IProductsBySowingRepository, ProductsBySowingRepository>();
 
@@ -208,6 +224,10 @@ builder.Services.AddScoped<IFogSyncService, FogSyncService>();
 
 builder.Services.AddHttpClient<IDeviceEventService, DeviceEventService>();
 
+// Audit Trail Services
+builder.Services.AddScoped<IAuditTrailRepository, AuditTrailRepository>();
+builder.Services.AddScoped<IAuditTrailCommandService, AuditTrailCommandService>();
+
 var app = builder.Build();
 
 // Verify Database Objects are created
@@ -215,7 +235,17 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
-    context.Database.EnsureCreated();
+    if (app.Environment.IsDevelopment())
+    {
+        // In development, drop and recreate the database
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+    }
+    else
+    {
+        // In production, apply migrations
+        context.Database.Migrate();
+    }
 }
 
 

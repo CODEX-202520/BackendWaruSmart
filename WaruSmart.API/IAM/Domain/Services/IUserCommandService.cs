@@ -7,4 +7,6 @@ public interface IUserCommandService
 {
     Task Handle(SignUpCommand command);
     Task<(User user, string token)> Handle(SignInCommand command);
+    Task Handle(UpdateUserSubscriptionCommand command);
+    Task Handle(CancelUserSubscriptionCommand command);
 }

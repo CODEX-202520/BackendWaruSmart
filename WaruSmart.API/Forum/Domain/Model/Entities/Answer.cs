@@ -8,18 +8,19 @@ public class Answer
 {
     public int Id { get; }
     public string AnswerText { get; private set; }
-    public UserId AuthorId { get; }
+    public UserId Author { get; }
+    public int AuthorId { get; private set; }
     public Question Question { get; set; }
     public int QuestionId { get; private set; }
 
     public Answer()
     {
-        AuthorId = new UserId(1);
+        AuthorId = 1;
         AnswerText = string.Empty;
     }
     public Answer(int authorId,int questionId, string answerText)
     {
-        AuthorId = new UserId(authorId);
+        AuthorId = authorId;
         QuestionId = questionId;
         AnswerText = answerText;
     }

@@ -5,9 +5,9 @@ using WaruSmart.API.IAM.Domain.Model.ValueObjects;
 
 namespace WaruSmart.API.IAM.Domain.Model.Aggregates;
 
-public class User(string username, string passwordHash)
+public class User(string username, string passwordHash, ERole role = ERole.AGRICULTOR)
 {
-    public User() : this(string.Empty, string.Empty)
+    public User() : this(string.Empty, string.Empty, ERole.AGRICULTOR)
     {
     }
     
@@ -17,7 +17,13 @@ public class User(string username, string passwordHash)
 
     [JsonIgnore] public string PasswordHash { get; private set; } = passwordHash;
     
-    public ICollection<Sowing> Sowings { get; set; }
+    public ERole Role { get; private set; } = role;
+    
+    public ICollection<Sowing> Sowings { get; set; } = new List<Sowing>();
+    
+    public int? SubscriptionId { get; private set; }
+    public DateTime? SubscriptionStartDate { get; private set; }
+    public DateTime? SubscriptionEndDate { get; private set; }
     
     //TODO: Add feature about user with profile in bounded context IAM
     //public ProfileId Profile { get; set; }
@@ -33,5 +39,41 @@ public class User(string username, string passwordHash)
         Username = username;
         return this;
     }
+    
+    public User UpdateRole(ERole role)
+    {
+        Role = role;
+        return this;
+    }
 
+    public User UpdateSubscription(int subscriptionId, int durationInDays)
+    {
+        SubscriptionId = subscriptionId;
+        SubscriptionStartDate = DateTime.Now;
+        SubscriptionEndDate = DateTime.Now.AddDays(durationInDays);
+        return this;
+    }
+
+    public User UpdateSubscription(int subscriptionId, DateTime startDate, DateTime endDate)
+    {
+        SubscriptionId = subscriptionId;
+        SubscriptionStartDate = startDate;
+        SubscriptionEndDate = endDate;
+        return this;
+    }
+
+    public User CancelSubscription()
+    {
+        SubscriptionId = null;
+        SubscriptionStartDate = null;
+        SubscriptionEndDate = null;
+        return this;
+    }
+
+    public bool HasActiveSubscription()
+    {
+        return SubscriptionId.HasValue && 
+               SubscriptionEndDate.HasValue && 
+               SubscriptionEndDate.Value > DateTime.Now;
+    }
 }
