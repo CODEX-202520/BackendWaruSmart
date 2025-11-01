@@ -57,8 +57,7 @@ public class ProfileCommandService(
             command.FullName,
             command.EmailAddress,
             command.CountryId,
-            command.CityId,
-            command.SubscriptionId
+            command.CityId
         );
 
         await profileRepository.UpdateProfile(profile);

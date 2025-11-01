@@ -1,7 +1,11 @@
 ﻿namespace WaruSmart.API.Profiles.Domain.Model.Commands;
 
-public record CreateProfileCommand(string FirstName,
-    string LastName, string Email,
-    int CityId, int SubscriptionId, int CountryId, int UserId
-    ,string Role
-    );
+public record CreateProfileCommand(
+    string FirstName,
+    string LastName, 
+    string Email,
+    int CityId, 
+    int CountryId, 
+    int UserId,
+    string Role
+);

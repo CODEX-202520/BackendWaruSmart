@@ -199,16 +199,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 e.WithOwner().HasForeignKey("Id");
                 e.Property(a => a.Address).HasColumnName("EmailAddress");
             });
-    builder.Entity<Profile>().Property(p => p.SubscriptionId).IsRequired();
     builder.Entity<Profile>().Property(p => p.ERole).HasConversion<string>().IsRequired();
-            // Subscriptions Context
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().HasKey(s => s.Id);
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Name).IsRequired();
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Description).IsRequired();
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.Price).IsRequired();
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.DurationInDays).IsRequired();
-        builder.Entity<Profiles.Domain.Model.Aggregates.Subscription>().Property(s => s.IsActive).IsRequired();
+
+        // Subscriptions Context (now in IAM)
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().HasKey(s => s.Id);
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.Name).IsRequired();
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.Description).IsRequired();
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.Price).IsRequired();
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.DurationInDays).IsRequired();
+        builder.Entity<IAM.Domain.Model.Aggregates.Subscription>().Property(s => s.IsActive).IsRequired();
         
         
         // RELATIONSHIPS 

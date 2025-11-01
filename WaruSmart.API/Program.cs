@@ -41,6 +41,8 @@ using WaruSmart.API.Resources.Application.InboundServices;
 using WaruSmart.API.Resources.Domain.Repositories;
 using WaruSmart.API.Resources.Domain.Services;
 using WaruSmart.API.Resources.Infrastructure.Persistence.EFC;
+using WaruSmart.API.IAM.Interfaces.REST.Transform;
+using WaruSmart.API.Shared.Infrastructure.Persistence.EFC.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -205,10 +207,15 @@ builder.Services.AddScoped<IProfileCommandService, ProfileCommandService>();
 builder.Services.AddScoped<IProfileQueryService, ProfileQueryService>();
 builder.Services.AddScoped<IProfilesContextFacade, ProfilesContextFacade>();
 
-// Subscriptions Bounded Context Dependency Injections
+// Add Subscription Services to IAM Context
 builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
 builder.Services.AddScoped<ISubscriptionQueryService, SubscriptionQueryService>();
+
+// Add Subscription Assemblers
+builder.Services.AddScoped<SubscriptionResourceFromEntityAssembler>();
+builder.Services.AddScoped<CreateSubscriptionCommandFromResourceAssembler>();
+builder.Services.AddScoped<UpdateSubscriptionCommandFromResourceAssembler>();
 
 builder.Services.AddScoped<IProductsBySowingRepository, ProductsBySowingRepository>();
 
@@ -231,7 +238,7 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment())
     {
         // In development, drop and recreate the database
-
+        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
     else

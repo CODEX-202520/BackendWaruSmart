@@ -9,6 +9,7 @@ namespace WaruSmart.API.IAM.Application.Internal.CommandServices;
 
 public class UserCommandService(
     IUserRepository userRepository,
+    ISubscriptionRepository subscriptionRepository,
     IHashingService hashingService,
     ITokenService tokenService,
     IUnitOfWork unitOfWork
@@ -18,11 +19,25 @@ public class UserCommandService(
     {
         if (userRepository.ExistsByUsername(command.Username))
             throw new Exception($"Username {command.Username} is already taken");
+        
         var hashedPassword = hashingService.HashPassword(command.Password);
         var user = new User(command.Username, hashedPassword);
+
         try
         {
             await userRepository.AddAsync(user);
+
+            // Validar y configurar la suscripción del usuario
+            var subscription = await subscriptionRepository.FindByIdAsync(command.SubscriptionId);
+            if (subscription == null)
+                throw new Exception($"Subscription with id {command.SubscriptionId} not found");
+
+            // Configurar fechas de suscripción: desde ahora hasta 2 días después
+            var startDate = DateTime.UtcNow;
+            var endDate = startDate.AddDays(2); // Configuración por defecto de 2 días
+
+            user.UpdateSubscription(command.SubscriptionId, startDate, endDate);
+
             await unitOfWork.CompleteAsync();
         }
         catch (Exception e)
@@ -39,5 +54,26 @@ public class UserCommandService(
             throw new Exception("Invalid username or password");
         var token = tokenService.GenerateToken(user);
         return (user, token);
+    }
+
+    public async Task Handle(UpdateUserSubscriptionCommand command)
+    {
+        var user = await userRepository.FindByIdAsync(command.UserId) 
+            ?? throw new Exception($"User with id {command.UserId} not found");
+
+        var subscription = await subscriptionRepository.FindByIdAsync(command.SubscriptionId)
+            ?? throw new Exception($"Subscription with id {command.SubscriptionId} not found");
+
+        user.UpdateSubscription(command.SubscriptionId, subscription.DurationInDays);
+        await unitOfWork.CompleteAsync();
+    }
+
+    public async Task Handle(CancelUserSubscriptionCommand command)
+    {
+        var user = await userRepository.FindByIdAsync(command.UserId)
+            ?? throw new Exception($"User with id {command.UserId} not found");
+
+        user.CancelSubscription();
+        await unitOfWork.CompleteAsync();
     }
 }

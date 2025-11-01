@@ -12,8 +12,7 @@ public static class UpdateProfileCommandFromResourceAssembler
             resource.FullName,
             resource.EmailAddress,
             resource.CountryId,
-            resource.CityId,
-            resource.SubscriptionId
+            resource.CityId
         );
     }
 }

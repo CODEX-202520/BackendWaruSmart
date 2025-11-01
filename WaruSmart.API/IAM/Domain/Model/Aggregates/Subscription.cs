@@ -1,4 +1,4 @@
-namespace WaruSmart.API.Profiles.Domain.Model.Aggregates;
+namespace WaruSmart.API.IAM.Domain.Model.Aggregates;
 
 /// <summary>
 /// Subscription aggregate root
