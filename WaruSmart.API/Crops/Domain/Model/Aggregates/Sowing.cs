@@ -43,7 +43,7 @@ public partial class Sowing
         this.StartDate = DateTime.Now;
         this.EndDate = this.StartDate.AddMonths(6);
         this.AreaLand = command.AreaLand;
-        this.PhenologicalPhase = EPhenologicalPhase.Germination;
+        this.PhenologicalPhase = command.PhenologicalPhase ?? EPhenologicalPhase.Germination;
         this.CropId = command.CropId;
         this.UserId = command.UserId;
     }

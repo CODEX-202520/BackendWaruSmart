@@ -4,7 +4,11 @@ using WaruSmart.API.Crops.Domain.Repositories;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
+using iText.Layout.Properties;
 using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Layout.Borders;
+using iText.Layout.Properties;
 
 namespace WaruSmart.API.Crops.Application.CommandServices;
 
@@ -31,7 +35,7 @@ public class AuditTrailCommandService : IAuditTrailCommandService
             command.SowingId,
             command.Description,
             command.SoilMoisture,
-            command.SoilTemperature,
+            command.SoilTemperature,  
             command.AirTemperature,
             command.AirHumidity,
             command.ImageData,
@@ -52,37 +56,88 @@ public class AuditTrailCommandService : IAuditTrailCommandService
             var pdf = new PdfDocument(writer);
             var document = new Document(pdf);
 
-            document.Add(new Paragraph($"Reporte de Auditoría para Cultivo {sowing.Id}"));
-            document.Add(new Paragraph($"Fecha de Generación: {DateTime.Now:dd/MM/yyyy HH:mm}"));
-            
+            // Agregar estilos al título
+            var titleStyle = new Style()
+                .SetFontSize(20)
+                .SetBold()
+                .SetFontColor(new DeviceRgb(0, 95, 64)); // Color verde WaruSmart
+
+            document.Add(new Paragraph($"Reporte de Auditoría para Cultivo {sowing.Id}")
+                .AddStyle(titleStyle)
+                .SetTextAlignment(TextAlignment.CENTER)
+                .SetMarginBottom(20));
+
+            document.Add(new Paragraph($"Fecha de Generación: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                .SetTextAlignment(TextAlignment.RIGHT)
+                .SetMarginBottom(30));
+
+            // Crear tabla para la línea de tiempo
+            var table = new Table(new float[] { 1, 4 })
+                .SetWidth(UnitValue.CreatePercentValue(100))
+                .SetMarginBottom(20);
+
             foreach (var audit in audits)
             {
-                document.Add(new Paragraph("-------------------"));
-                document.Add(new Paragraph($"Fecha: {audit.CreatedAt:dd/MM/yyyy HH:mm}"));
-                document.Add(new Paragraph($"Descripción: {audit.Description}"));
-                document.Add(new Paragraph($"Humedad del Suelo: {audit.SoilMoisture}%"));
-                document.Add(new Paragraph($"Temperatura del Suelo: {audit.SoilTemperature}°C"));
-                document.Add(new Paragraph($"Temperatura del Aire: {audit.AirTemperature}°C"));
-                document.Add(new Paragraph($"Humedad del Aire: {audit.AirHumidity}%"));
+                // Celda de fecha con línea vertical
+                var dateCell = new Cell()
+                    .Add(new Paragraph($"{audit.CreatedAt:dd/MM/yyyy\nHH:mm}")
+                        .SetTextAlignment(TextAlignment.CENTER))
+                    .SetBorderLeft(new SolidBorder(new DeviceRgb(0, 95, 64), 2)) // Línea verde
+                    .SetBorderRight(Border.NO_BORDER)
+                    .SetBorderTop(Border.NO_BORDER)
+                    .SetBorderBottom(Border.NO_BORDER)
+                    .SetPaddingLeft(10)
+                    .SetPaddingRight(10);
+
+                // Celda de contenido con fondo
+                var contentCell = new Cell()
+                    .Add(new Paragraph($"Descripción: {audit.Description}")
+                        .SetMarginBottom(5))
+                    .Add(new Paragraph()
+                        .Add(new Text("Condiciones ambientales:").SetBold())
+                        .SetMarginBottom(5))
+                    .Add(new Paragraph()
+                        .Add($"• Humedad del Suelo: {audit.SoilMoisture}%\n")
+                        .Add($"• Temperatura del Suelo: {audit.SoilTemperature}°C\n")
+                        .Add($"• Temperatura del Aire: {audit.AirTemperature}°C\n")
+                        .Add($"• Humedad del Aire: {audit.AirHumidity}%")
+                        .SetMarginLeft(20));
 
                 if (audit.ImageData != null && audit.ImageData.Length > 0)
                 {
                     try
                     {
-                        using (var imageStream = new MemoryStream(audit.ImageData))
-                        {
-                            var imgData = ImageDataFactory.Create(audit.ImageData);
-                            var img = new Image(imgData);
-                            img.SetWidth(200);
-                            document.Add(img);
-                        }
+                        using var imageStream = new MemoryStream(audit.ImageData);
+                        var imgData = ImageDataFactory.Create(audit.ImageData);
+                        var img = new Image(imgData)
+                            .SetWidth(150)
+                            .SetBorderRadius(new BorderRadius(75)) // Hacer la imagen circular
+                            .SetHorizontalAlignment(HorizontalAlignment.CENTER)
+                            .SetMarginTop(10)
+                            .SetMarginBottom(10);
+                        contentCell.Add(img);
                     }
                     catch (Exception)
                     {
-                        document.Add(new Paragraph("(Imagen no disponible)"));
+                        contentCell.Add(new Paragraph("(Imagen no disponible)"));
                     }
                 }
+
+                // Aplicar estilos a la celda de contenido
+                contentCell
+                    .SetBackgroundColor(new DeviceRgb(245, 247, 250))
+                    .SetBorder(new SolidBorder(new DeviceRgb(0, 95, 64), 1))
+                    .SetBorderRadius(new BorderRadius(5))
+                    .SetPadding(10)
+                    .SetMargin(10);
+
+                // Agregar celdas a la tabla
+                table.AddCell(dateCell);
+                table.AddCell(contentCell);
             }
+
+            // Agregar la tabla al documento
+            document.Add(table);
 
             document.Close();
             return ms.ToArray();
