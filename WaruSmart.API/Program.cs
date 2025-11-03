@@ -212,6 +212,13 @@ builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
 builder.Services.AddScoped<ISubscriptionCommandService, SubscriptionCommandService>();
 builder.Services.AddScoped<ISubscriptionQueryService, SubscriptionQueryService>();
 
+// Analytics Bounded Context Dependency Injections
+builder.Services.AddScoped<WaruSmart.API.Analytics.Domain.Repositories.IAnalyticsRepository, WaruSmart.API.Analytics.Infrastructure.Persistence.AnalyticsRepository>();
+builder.Services.AddScoped<WaruSmart.API.Analytics.Application.QueryServices.IAnalyticsQueryService, WaruSmart.API.Analytics.Application.QueryServices.AnalyticsQueryService>();
+builder.Services.AddHostedService<WaruSmart.API.Resources.Infrastructure.Persistence.EFC.FogSyncBackgroundService>();
+
+
+
 // Add Subscription Assemblers
 builder.Services.AddScoped<SubscriptionResourceFromEntityAssembler>();
 builder.Services.AddScoped<CreateSubscriptionCommandFromResourceAssembler>();
@@ -230,6 +237,7 @@ builder.Services.AddScoped<IAuditTrailCommandService, AuditTrailCommandService>(
 
 var app = builder.Build();
 
+
 // Verify Database Objects are created
 using (var scope = app.Services.CreateScope())
 {
@@ -238,7 +246,6 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment())
     {
         // In development, drop and recreate the database
-        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
     else

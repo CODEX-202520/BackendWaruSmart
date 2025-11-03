@@ -10,14 +10,26 @@ public class RequestAuthorizationMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context, IUserQueryService userQueryService, ITokenService tokenService)
     {
         Console.WriteLine("Entering InvokeAsync");
-        // skip authorization if endpoint is decorated with [AllowAnonymous] attribute
-        var allowAnonymous = context.Request.HttpContext.GetEndpoint()!
-            .Metadata.Any(m => m.GetType() == typeof(AllowAnonymousAttribute));
+        // Get the endpoint (might be null for non-endpoint middleware)
+        var endpoint = context.GetEndpoint();
+        
+        // If no endpoint or it has [AllowAnonymous], skip authorization
+        if (endpoint == null)
+        {
+            Console.WriteLine("No endpoint found - skipping authorization");
+            await next(context);
+            return;
+        }
+
+        // Check for both our custom AllowAnonymousAttribute and Microsoft's AllowAnonymousAttribute
+        var allowAnonymous = endpoint.Metadata?.Any(m => 
+            m.GetType() == typeof(AllowAnonymousAttribute) || 
+            m.GetType().Name == "AllowAnonymousAttribute") ?? false;
+            
         Console.WriteLine($"Allow Anonymous is {allowAnonymous}");
         if (allowAnonymous)
         {
-            Console.WriteLine("Skipping authorization");
-            // [AllowAnonymous] attribute is set, so skip authorization
+            Console.WriteLine("Skipping authorization - [AllowAnonymous] found");
             await next(context);
             return;
         }

@@ -1,3 +1,9 @@
-﻿namespace WaruSmart.API.Crops.Domain.Model.Commands;
+﻿using WaruSmart.API.Crops.Domain.Model.ValueObjects;
 
-public record CreateSowingCommand(int AreaLand,int CropId, int UserId);
+namespace WaruSmart.API.Crops.Domain.Model.Commands;
+
+public record CreateSowingCommand(
+    int AreaLand,
+    int CropId,
+    int UserId,
+    EPhenologicalPhase? PhenologicalPhase = null);

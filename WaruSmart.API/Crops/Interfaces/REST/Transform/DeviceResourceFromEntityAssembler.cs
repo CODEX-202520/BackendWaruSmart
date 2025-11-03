@@ -19,7 +19,9 @@ public static class DeviceResourceFromEntityAssembler
             device.Humidity,
             device.Temprature,
             device.SoilMoisture,
-            device.LastSyncDate
+            device.LastSyncDate,
+            device.ManuallyActive,
+            device.OverwriteAutomation
         );
 
     }

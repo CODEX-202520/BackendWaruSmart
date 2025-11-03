@@ -14,8 +14,8 @@ public static class GeneralInformationDeviceResourceFromListEntitiesAssembler
             QuantityActiveDevices: devices.Count(d => d.Status == "Active"),
             QuantityInactiveDevices: devices.Count(d => d.Status == "Inactive"),
             QuantityDisconnectedDevices: devices.Count(d => d.Status == "Disconnected"),
-            QuantitySensorDevices: devices.Count(d => d.DeviceType == EDeviceType.Sensor),
-            QuantityActuatorDevices: devices.Count(d => d.DeviceType == EDeviceType.Actuator)
+            QuantitySensorDevices: devices.Count(d => d.DeviceType == EDeviceType.EnvironmentCollector),
+            QuantityActuatorDevices: devices.Count(d => d.DeviceType == EDeviceType.IrrigationController)
         );
     }
 }

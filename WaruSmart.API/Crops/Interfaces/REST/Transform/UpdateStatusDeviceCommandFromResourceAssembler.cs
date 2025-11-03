@@ -8,7 +8,9 @@ public static class UpdateStatusDeviceCommandFromResourceAssembler
     public static UpdateStatusDeviceCommand ToCommandFromResource(UpdateStatusDeviceResource resource)
     {
         return new UpdateStatusDeviceCommand(
-            resource.Status
+            resource.Status,
+            resource.ManuallyActive,
+            resource.OverwriteAutomation
         );
     }
 }

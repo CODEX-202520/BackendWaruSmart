@@ -15,15 +15,21 @@ public class Device
     public DateTime? LastSyncDate { get; set; }
     public string? Location { get; private set; }
     
-    public Sowing Sowing { get; private set; }
+    public Sowing Sowing { get; set; }
     
-    public int SowingId { get; private set; }
+    public int SowingId { get; set; }
     
     public double? Humidity { get; set; }
     
     public double? Temprature { get; set; }
     
     public double? SoilMoisture { get; set; }
+    
+    // Column for manual control of device
+    public bool ManuallyActive { get; set; } = false;
+    
+    // Column to determine if automation should be overridden
+    public bool OverwriteAutomation { get; set; } = false;
 
     public Device(string name, string deviceId, string location)
     {
@@ -55,11 +61,15 @@ public class Device
         Humidity = 0;
         Temprature = 0;
         SoilMoisture = 0;
+        ManuallyActive = false;
+        OverwriteAutomation = false;
     }
 
     public void UpdateStatus(UpdateStatusDeviceCommand command)
     {
         Status = command.Status;
+        ManuallyActive = command.ManuallyActive;
+        OverwriteAutomation = command.OverwriteAutomation;
     }
 
     public void UpdateLastSyncDate(DateTime syncDate)
