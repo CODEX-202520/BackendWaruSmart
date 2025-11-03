@@ -12,5 +12,7 @@ public record DeviceResource(
     double? Humidity,
     double? Temperature,
     double? SoilMoisture,
-    DateTime? TimeSinceLastSync
+    DateTime? TimeSinceLastSync,
+    bool ManuallyActive,
+    bool OverwriteAutomation
 );

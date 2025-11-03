@@ -25,13 +25,15 @@ namespace WaruSmart.API.Crops.Interfaces.REST
             {
                 var query = new GetAllDevicesWithPhasesQuery();
                 var devices = await _sowingQueryService.Handle(query);
-                
+
                 var result = devices.Select(d => new
                 {
                     device_id = d.DeviceId,
                     phenological_phase = d.Sowing?.PhenologicalPhase.ToString() ?? "Germination",
                     sowing_id = d.SowingId,
                     device_name = d.Name,
+                    manually_active = d.ManuallyActive,
+                    overwrite_automation = d.OverwriteAutomation,
                     last_sync = d.LastSyncDate
                 });
 
