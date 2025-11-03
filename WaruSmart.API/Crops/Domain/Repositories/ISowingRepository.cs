@@ -13,4 +13,6 @@ public interface ISowingRepository : IBaseRepository<Sowing>
     Task<IEnumerable<Sowing>> FindAllByUserIdAsync(int userId);
     
     Task<Sowing?> FindSowingByIdAsync(int id);
+    
+    Task<IEnumerable<Sowing>> FindAllWithDevicesAsync();
 }

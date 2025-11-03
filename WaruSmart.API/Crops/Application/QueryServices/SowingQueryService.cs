@@ -32,4 +32,20 @@ public class SowingQueryService(ISowingRepository sowingRepository)
     {
         return await sowingRepository.FindAllByUserIdAsync(query.UserId);
     }
+
+    public async Task<Sowing?> Handle(GetSowingByDeviceIdQuery query)
+    {
+        var allSowings = await sowingRepository.FindAllAsync();
+        return allSowings.FirstOrDefault(s => s.Devices.Any(d => d.DeviceId == query.DeviceId));
+    }
+
+    public async Task<IEnumerable<Device>> Handle(GetAllDevicesWithPhasesQuery query)
+    {
+        var sowingsWithDevices = await sowingRepository.FindAllWithDevicesAsync();
+        var devices = sowingsWithDevices
+            .SelectMany(s => s.Devices)
+            .ToList();
+        
+        return devices;
+    }
 }

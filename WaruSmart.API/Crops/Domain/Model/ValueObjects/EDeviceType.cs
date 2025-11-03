@@ -2,6 +2,6 @@
 
 public enum EDeviceType
 {
-    Sensor,
-    Actuator
+    EnvironmentCollector,
+    IrrigationController
 }

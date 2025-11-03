@@ -15,9 +15,9 @@ public class Device
     public DateTime? LastSyncDate { get; set; }
     public string? Location { get; private set; }
     
-    public Sowing Sowing { get; private set; }
+    public Sowing Sowing { get; set; }
     
-    public int SowingId { get; private set; }
+    public int SowingId { get; set; }
     
     public double? Humidity { get; set; }
     

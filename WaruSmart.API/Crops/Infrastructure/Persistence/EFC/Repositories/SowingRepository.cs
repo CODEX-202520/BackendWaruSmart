@@ -48,4 +48,11 @@ public class SowingRepository : BaseRepository<Sowing>, ISowingRepository
     {
         return await Context.Set<Sowing>().Where(s => s.UserId == userId).ToListAsync();
     }
+    
+    public async Task<IEnumerable<Sowing>> FindAllWithDevicesAsync()
+    {
+        return await Context.Set<Sowing>()
+            .Include(s => s.Devices)
+            .ToListAsync();
+    }
 }

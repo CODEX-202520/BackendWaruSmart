@@ -11,7 +11,7 @@ namespace WaruSmart.API.Crops.Application.EventServices
     public class DeviceEventService : IDeviceEventService
     {
         private readonly HttpClient _httpClient;
-        private const string EdgeAppUrl = "https://edge-app-iot.example.com/api/device/update-status"; // TODO: Change the correct URL for the edge app
+        private static readonly string EdgeAppUrl = Environment.GetEnvironmentVariable("EDGE_APP_URL") ?? "http://localhost:5000/api/events";            
 
         public DeviceEventService(HttpClient httpClient)
         {

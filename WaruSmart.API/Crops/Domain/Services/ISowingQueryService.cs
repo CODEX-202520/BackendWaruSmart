@@ -13,5 +13,6 @@ public interface ISowingQueryService
     Task<IEnumerable<Sowing>> Handle(GetAllSowingsQuery query);
     
     Task<IEnumerable<Sowing>> Handle(GetAllSowingsByUserIdQuery query);
-
+    Task<Sowing?> Handle(GetSowingByDeviceIdQuery query);
+    Task<IEnumerable<Device>> Handle(GetAllDevicesWithPhasesQuery query);
 }
